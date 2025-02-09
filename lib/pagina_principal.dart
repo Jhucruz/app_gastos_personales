@@ -1,4 +1,3 @@
-import 'package:app_gastos_personales/ingresar_fecha.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -10,9 +9,12 @@ class PaginaPrincipal extends StatefulWidget {
 }
 
 class _PaginaPrincipalState extends State<PaginaPrincipal> {
-  final TextEditingController fechaGastos = TextEditingController();
-  final TextEditingController _Descripcion = TextEditingController();
-  final TextEditingController _Precio = TextEditingController();
+  final TextEditingController fecha = TextEditingController();
+  final TextEditingController _descripcion = TextEditingController();
+  final TextEditingController _precio = TextEditingController();
+
+  final List<Map<String, String>> _gastos = [];
+
   selectedDate() async {
     DateTime? dateSelected = await showDatePicker(
       context: context,
@@ -20,7 +22,42 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
       firstDate: DateTime(2025),
       lastDate: DateTime(2026),
     );
-    fechaGastos.text = dateSelected.toString().substring(0, 10);
+    fecha.text = dateSelected.toString().substring(0, 10);
+  }
+
+  void _agregarGasto() {
+    if (fecha.text.isNotEmpty &&
+        _descripcion.text.isNotEmpty &&
+        _precio.text.isNotEmpty) {
+      setState(() {
+        _gastos.add({
+          'fecha': fecha.text,
+          'descripcion': _descripcion.text,
+          'precio': _precio.text,
+        });
+      });
+      fecha.clear();
+      _descripcion.clear();
+      _precio.clear();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ListaGastosPage(
+            gastos: _gastos,
+            onDelete: (index) {
+              setState(() {
+                _gastos.removeAt(index);
+              });
+            },
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, completa todos los campos.')),
+      );
+    }
   }
 
   @override
@@ -48,13 +85,13 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Form(
-                          child: Container(
+                          child: SizedBox(
                             height: 320,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 TextFormField(
-                                  controller: fechaGastos,
+                                  controller: fecha,
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
@@ -68,36 +105,35 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
                                   },
                                 ),
                                 TextFormField(
-                                  controller: _Descripcion,
+                                  controller: _descripcion,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           gapPadding: 16),
-                                      labelText: "Descripciòn"),
+                                      labelText: "descripciòn"),
                                 ),
                                 TextFormField(
-                                  controller: _Precio,
+                                  controller: _precio,
                                   keyboardType: TextInputType.text,
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           gapPadding: 16),
-                                      labelText: "Precio"),
+                                      labelText: "precio"),
                                 ),
                                 ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: _agregarGasto,
                                     child: Text(
                                       "Agregar",
                                     )),
                                 ElevatedButton(
                                     onPressed: () {
-                                      fechaGastos.clear();
-                                      _Descripcion.clear();
-                                      _Precio.clear();
-                                      ;
+                                      fecha.clear();
+                                      _descripcion.clear();
+                                      _precio.clear();
                                     },
                                     child: Text(
                                       "reset",
@@ -121,6 +157,39 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
             fit: BoxFit.contain,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ListaGastosPage extends StatelessWidget {
+  final List<Map<String, String>> gastos;
+  final Function(int) onDelete;
+
+  const ListaGastosPage(
+      {required this.gastos, required this.onDelete, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Lista de Gastos"),
+      ),
+      body: ListView.builder(
+        itemCount: gastos.length,
+        itemBuilder: (context, index) {
+          final gasto = gastos[index];
+          return Card(
+            child: ListTile(
+              title: Text('${gasto['descripcion']} - ${gasto['precio']}'),
+              subtitle: Text('Fecha: ${gasto['fecha']}'),
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: () => onDelete(index),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
