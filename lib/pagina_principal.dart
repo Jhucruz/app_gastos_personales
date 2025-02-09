@@ -1,3 +1,5 @@
+import 'package:app_gastos_personales/animacion.dart';
+import 'package:app_gastos_personales/lista_gastos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -79,118 +81,79 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
                 color: Colors.red,
               ), // Ícono del botón
               onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (constex) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Form(
-                          child: SizedBox(
-                            height: 320,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                TextFormField(
-                                  controller: fecha,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          gapPadding: 16),
-                                      labelText: "Fecha "),
-                                  onTap: () {
-                                    FocusScope.of(context)
-                                        .requestFocus(FocusNode());
-                                    selectedDate();
-                                  },
-                                ),
-                                TextFormField(
-                                  controller: _descripcion,
-                                  keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          gapPadding: 16),
-                                      labelText: "descripciòn"),
-                                ),
-                                TextFormField(
-                                  controller: _precio,
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          gapPadding: 16),
-                                      labelText: "precio"),
-                                ),
-                                ElevatedButton(
-                                    onPressed: _agregarGasto,
-                                    child: Text(
-                                      "Agregar",
-                                    )),
-                                ElevatedButton(
-                                    onPressed: () {
-                                      fecha.clear();
-                                      _descripcion.clear();
-                                      _precio.clear();
-                                    },
-                                    child: Text(
-                                      "reset",
-                                    )),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    });
+                ingresarGasto(
+                  context,
+                );
               },
             ),
           ],
         ),
-        body: Center(
-          child: Lottie.asset(
-            'assets/animations/Animation01.json',
-            repeat: false,
-            width: 400,
-            height: 400,
-            fit: BoxFit.contain,
-          ),
-        ),
+        body: Animacion(),
       ),
     );
   }
-}
 
-class ListaGastosPage extends StatelessWidget {
-  final List<Map<String, String>> gastos;
-  final Function(int) onDelete;
-
-  const ListaGastosPage(
-      {required this.gastos, required this.onDelete, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Lista de Gastos"),
-      ),
-      body: ListView.builder(
-        itemCount: gastos.length,
-        itemBuilder: (context, index) {
-          final gasto = gastos[index];
-          return Card(
-            child: ListTile(
-              title: Text('${gasto['descripcion']} - ${gasto['precio']}'),
-              subtitle: Text('Fecha: ${gasto['fecha']}'),
-              trailing: IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () => onDelete(index),
+  Future<dynamic> ingresarGasto(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (_) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              child: SizedBox(
+                height: 320,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextFormField(
+                      controller: fecha,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              gapPadding: 16),
+                          labelText: "Fecha "),
+                      onTap: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        selectedDate();
+                      },
+                    ),
+                    TextFormField(
+                      controller: _descripcion,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              gapPadding: 16),
+                          labelText: "descripciòn"),
+                    ),
+                    TextFormField(
+                      controller: _precio,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              gapPadding: 16),
+                          labelText: "precio"),
+                    ),
+                    ElevatedButton(
+                        onPressed: _agregarGasto,
+                        child: Text(
+                          "Agregar",
+                        )),
+                    ElevatedButton(
+                        onPressed: () {
+                          fecha.clear();
+                          _descripcion.clear();
+                          _precio.clear();
+                        },
+                        child: Text(
+                          "reset",
+                        )),
+                  ],
+                ),
               ),
             ),
           );
-        },
-      ),
-    );
+        });
   }
 }
